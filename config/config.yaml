@@ -1,0 +1,66 @@
+# ============================================================
+# DaoNovice 运行配置
+# 所有可调参数集中于此，代码不写死阈值 / 端口 / 模型名
+# 环境变量可覆盖同名配置，例如 ARK_API_KEY 覆盖 llm.doubao.api_key
+# ============================================================
+
+server:
+  host: 0.0.0.0
+  port: 8000
+  log_level: info
+
+breath:
+  # 初始呼吸间隔（秒），脉冲呼吸会在区间内自适应浮动
+  base_interval: 8
+  min_interval: 3
+  max_interval: 20
+
+# 三空硬约束
+emptiness:
+  max_consecutive_hexagram: 100   # 同一卦象连续超过该值即触发“五蕴皆空”防漂移
+  resource_reserve: 0.2          # “无之为用”：永久保留 20% 资源留白
+  identity_check_days: 30        # “君子不器”：身份复盘周期（天）
+
+# 六项五蕴观测指标权重（合计应为 1.0）
+indicators:
+  cpu: 0.25
+  memory: 0.25
+  disk_io: 0.15
+  network: 0.15
+  ollama_latency: 0.10
+  process_count: 0.10
+
+# 定力调节
+samadhi:
+  pain_threshold_high: 0.6       # 痛苦指数高于此值，定力衰减
+  pain_threshold_low: 0.1       # 痛苦指数低于此值，定力回升
+  decay_step: 0.12
+  rise_step: 0.03
+
+llm:
+  # 底座顺序：先尝试本地 Ollama，不可用则降级；配置 doubao 后作为远端兜底
+  primary: ollama
+  ollama:
+    base_url: http://localhost:11434
+    model: qwen2.5:3b
+    timeout: 30
+  doubao:
+    enabled: false
+    # api_key 优先读取环境变量 ARK_API_KEY，避免硬编码入库
+    api_key: ""
+    endpoint: https://ark.cn-beijing.volces.com/api/v3/chat/completions
+    model: doubao-pro-4k
+    timeout: 30
+  # 熔断器：连续失败 N 次后进入冷却，冷却期内直接走降级文案
+  circuit:
+    failure_threshold: 3
+    cooldown_seconds: 60
+  max_tokens: 1200
+
+memory:
+  db_path: data/regret.db
+
+plugins:
+  dir: src/daonovice/plugins
+  # 加载失败的插件被隔离禁用，不阻止内核觉醒
+  isolate_on_error: true

@@ -1,0 +1,17 @@
+[Unit]
+Description=DaoNovice Digital Life Core
+After=network.target redis.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/daonovice
+Environment=PYTHONPATH=/opt/daonovice/src
+EnvironmentFile=-/opt/daonovice/.env
+ExecStart=/opt/daonovice/.venv/bin/python -m daonovice.main
+Restart=on-failure
+RestartSec=5
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

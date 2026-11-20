@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# 运行时数据
+/data/
+/logs/
+*.db
+*.sqlite3
+harness/regret.db
+
+# 密钥与本地配置
+.env
+config/local.yaml
+*.key
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
